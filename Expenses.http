@@ -1,0 +1,11 @@
+@Expenses_HostAddress = http://localhost:5225
+
+GET {{Expenses_HostAddress}}/api/expenses
+Accept: application/json
+
+###
+
+GET {{Expenses_HostAddress}}/api/expenses/1
+Accept: application/json
+
+###
