@@ -34,4 +34,56 @@ public class ExpensesController : ControllerBase
     {
         return Ok(_expenses);
     }
+
+    [HttpGet("filter")]
+    public IActionResult GetExpensesByFilter([FromQuery] string? category, [FromQuery] string? paymentMethod)
+    {
+        var expenses = _expenses.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(category))
+        {
+            expenses = expenses.Where(x => x.Category.Equals(category, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(paymentMethod))
+        {
+            expenses = expenses.Where(x => x.PaymentMethod.Equals(paymentMethod, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return Ok(expenses);
+    }
+
+    [HttpPut("{id:guid}")]
+    public IActionResult UpdateExpense(Guid id, [FromBody] ExpenseDTO expense)
+    {
+        var existingExpense = _expenses.FirstOrDefault(x => x.Id == id);
+
+        if (existingExpense is null)
+        {
+            return NotFound(new { message = "Expense not found." });
+        }
+
+        existingExpense.Description = expense.Description;
+        existingExpense.Amount = expense.Amount;
+        existingExpense.Date = expense.Date;
+        existingExpense.Category = expense.Category;
+        existingExpense.PaymentMethod = expense.PaymentMethod;
+
+        return Ok(existingExpense);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public IActionResult DeleteExpense(Guid id)
+    {
+        var existingExpense = _expenses.FirstOrDefault(x => x.Id == id);
+
+        if (existingExpense is null)
+        {
+            return NotFound(new { message = "Expense not found." });
+        }
+
+        _expenses.Remove(existingExpense);
+
+        return NoContent();
+    }
 }
